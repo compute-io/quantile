@@ -1,8 +1,12 @@
-quantile
+Quantile
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
 > Computes a quantile for a numeric array.
+
+This module determines the nearest rank and returns the `array` value corresponding to that rank.
+
+This module does __not__ currently support multiple interpolation methods, and instead uses a standard [elementary method](http://en.wikipedia.org/wiki/Quantile#Estimating_the_quantiles_of_a_population) for estimating the quantile.
 
 
 ## Installation
@@ -19,18 +23,44 @@ For use in the browser, use [browserify](https://github.com/substack/node-browse
 To use the module,
 
 ``` javascript
-var foo = require( 'compute-quantile' );
+var quantile = require( 'compute-quantile' );
 ```
 
-#### foo( arr )
+#### quantile( arr, p[, opts] )
 
-What does this function do?
+Given a probability `p` (`0 <= p <= 1`), computes the quantile for an input `array`.
+
+``` javascript
+var data = [ 4, 3, 5, 1, 2 ];
+
+quantile( data, 0.25 );
+// returns 2
+```
+
+If the input `array` is already sorted in __ascending__ order, you can set the `sorted` option to `true`.
+
+``` javascript
+var sorted = [ 1, 2, 3, 4, 5 ];
+
+quantile( data, 0.25, { 'sorted': true } );
+// returns 2
+```
 
 
 ## Examples
 
 ``` javascript
-var foo = require( 'compute-quantile' );
+var quantile = require( 'compute-quantile' );
+
+// Simulate some data...
+var data = new Array( 1000 );
+
+for ( var i = 0, len = data.length; i < len; i++ ) {
+	data[ i ] = Math.round( Math.random()*1000 );
+}
+
+// Compute the p-quantile for p = 0.5 (median):
+console.log( quantile( data, 0.5 ) );
 ```
 
 To run the example code from the top-level application directory,
@@ -38,6 +68,13 @@ To run the example code from the top-level application directory,
 ``` bash
 $ node ./examples/index.js
 ```
+
+
+## Notes
+
+The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the _k_th quantile.
+
+If the input `array` is not sorted in __ascending__ order, the function is `O( N log(N) )`, where `N` is the input `array` length. If the `array` is sorted, the function is `O(1)`.
 
 
 ## Tests
