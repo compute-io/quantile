@@ -2,7 +2,7 @@ Quantile
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
-> Computes a quantile for a numeric array.
+> Computes a [quantile](http://en.wikipedia.org/wiki/Quantile) for a numeric array.
 
 This module determines the nearest rank and returns the `array` value corresponding to that rank.
 
@@ -72,7 +72,7 @@ $ node ./examples/index.js
 
 ## Notes
 
-The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the *k*th quantile.
+The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the _k_ th quantile.
 
 If the input `array` is not sorted in __ascending__ order, the function is `O( N log(N) )`, where `N` is the input `array` length. If the `array` is sorted, the function is `O(1)`.
 
