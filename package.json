@@ -1,6 +1,6 @@
 {
   "name": "compute-quantile",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Computes a quantile for a numeric array.",
   "author": {
     "name": "Athan Reines",
