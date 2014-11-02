@@ -72,7 +72,7 @@ $ node ./examples/index.js
 
 ## Notes
 
-The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the _k_th quantile.
+The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the *k*th quantile.
 
 If the input `array` is not sorted in __ascending__ order, the function is `O( N log(N) )`, where `N` is the input `array` length. If the `array` is sorted, the function is `O(1)`.
 
