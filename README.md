@@ -31,9 +31,9 @@ var quantile = require( 'compute-quantile' );
 Given a probability `0 <= p <= 1`, computes the quantile for an input `array`.
 
 ``` javascript
-var data = [ 4, 3, 5, 1, 2 ];
+var unsorted = [ 4, 3, 5, 1, 2 ];
 
-quantile( data, 0.25 );
+var q = quantile( unsorted, 0.25 );
 // returns 2
 ```
 
@@ -42,7 +42,7 @@ If the input `array` is already sorted in __ascending__ order, you can set the `
 ``` javascript
 var sorted = [ 1, 2, 3, 4, 5 ];
 
-quantile( data, 0.25, { 'sorted': true } );
+var q = quantile( sorted, 0.25, { 'sorted': true } );
 // returns 2
 ```
 
