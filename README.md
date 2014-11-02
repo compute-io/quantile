@@ -28,7 +28,7 @@ var quantile = require( 'compute-quantile' );
 
 #### quantile( arr, p[, opts] )
 
-Given a probability `p` (`0 <= p <= 1`), computes the quantile for an input `array`.
+Given a probability `0 <= p <= 1`, computes the quantile for an input `array`.
 
 ``` javascript
 var data = [ 4, 3, 5, 1, 2 ];
