@@ -152,6 +152,10 @@ describe( 'compute-quantile', function tests() {
 
 		assert.strictEqual( quantile( data, 0.9 ), 7.5 );
 
+		assert.strictEqual( quantile( data, 0 ), 1 );
+
+		assert.strictEqual( quantile( data, 1 ), 8 );
+
 		data.sort( function sort( a, b ) {
 			return a - b;
 		});
