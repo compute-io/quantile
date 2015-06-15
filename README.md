@@ -37,6 +37,22 @@ q = quantile( unsorted, 0.25 );
 // returns 2
 ```
 
+The `quantile` function supports nine methods to calculate the sample quantiles:
+
+| Method        |   Description |
+| ------------- |:-------------:|
+| 1      | Inverse of empirical distribution function. |
+| 2      | Inverse of empirical distribution function. |
+| 3      | The observation numbered closest to `N * p`.|
+| 4      | Linear interpolation of the empirical distribution function.|
+| 5      | Piecewise linear function where the knots are the values midway through the steps of the empirical distribution function.|
+| 6      | Linear interpolation of the expectations for the order statistics for the uniform distribution on [0,1].|
+| 7      | Linear interpolation of the modes for the order statistics for the uniform distribution on [0,1]. |
+| 8      | Linear interpolation of the approximate medians for order statistics.|
+| 9      | The resulting quantile estimates are approximately unbiased for the expected order statistics if x is normally distributed.|
+
+The default method is type `7`. To specify a different method, you can set the `method` option to the respective number.
+
 If the input `array` is already sorted in __ascending__ order, you can set the `sorted` option to `true`.
 
 ``` javascript
@@ -112,7 +128,7 @@ median = quantile( mat, 0.5 );
 To compute a [quantile](http://en.wikipedia.org/wiki/Quantile) along the rows, set the `dim` option to `1`.
 
 ``` javascript
-mu = mean( mat, {
+median = quantile( mat, 0.5, {
 	'dim': 1
 });
 /*
@@ -123,7 +139,7 @@ mu = mean( mat, {
 By default, the output [`matrix`](https://github.com/dstructs/matrix) data type is `float64`. To specify a different output data type, set the `dtype` option.
 
 ``` javascript
-mu = mean( mat, {
+median = quantile( mat, 0.5, {
 	'dim': 1,
 	'dtype': 'uint8'
 });
@@ -131,7 +147,7 @@ mu = mean( mat, {
 	[ 10, 11, 12, 13, 14 ]
 */
 
-var dtype = mu.dtype;
+var dtype = median.dtype;
 // returns 'uint8'
 ```
 
@@ -142,13 +158,13 @@ data = [ 2, 4, 5, 3, 8, 2 ];
 
 // Row vector:
 mat = matrix( new Int8Array( data ), [1,6], 'int8' );
-mu = mean( mat );
-// returns 4
+median = quantile( mat, 0.5 );
+// returns 3.5
 
 // Column vector:
 mat = matrix( new Int8Array( data ), [6,1], 'int8' );
-mu = mean( mat );
-// returns 4
+median = quantile( mat, 0.5 );
+// returns 3.5
 ```
 
 If provided an empty [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays), or [`matrix`](https://github.com/dstructs/matrix), the function returns `null`.
