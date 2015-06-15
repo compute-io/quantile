@@ -2,12 +2,9 @@ Quantile
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
-> Computes a [quantile](http://en.wikipedia.org/wiki/Quantile) for a numeric array.
+> Computes a [quantile](http://en.wikipedia.org/wiki/Quantile).
 
 This module determines the nearest rank and returns the `array` value corresponding to that rank.
-
-This module does __not__ currently support multiple interpolation methods, and instead uses a standard [elementary method](http://en.wikipedia.org/wiki/Quantile#Estimating_the_quantiles_of_a_population) for estimating the quantile.
-
 
 ## Installation
 
@@ -20,20 +17,23 @@ For use in the browser, use [browserify](https://github.com/substack/node-browse
 
 ## Usage
 
-To use the module,
-
 ``` javascript
 var quantile = require( 'compute-quantile' );
 ```
 
-#### quantile( arr, p[, opts] )
+#### quantile( x, p[, opts] )
 
-Given a probability `0 <= p <= 1`, computes the quantile for an input `array`.
+Given a probability `0 <= p <= 1`, computes the quantile for input `x`. `x` may be either an [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays), or [`matrix`](https://github.com/dstructs/matrix).
 
 ``` javascript
-var unsorted = [ 4, 3, 5, 1, 2 ];
+var unsorted, q;
 
-var q = quantile( unsorted, 0.25 );
+unsorted = [ 4, 3, 5, 1, 2 ];
+q = quantile( unsorted, 0.25 );
+// returns 2
+
+unsorted = new Int8Array( unsorted );
+q = quantile( unsorted, 0.25 );
 // returns 2
 ```
 
@@ -46,21 +46,196 @@ var q = quantile( sorted, 0.25, { 'sorted': true } );
 // returns 2
 ```
 
+For non-numeric `arrays`, provide an accessor `function` for accessing `array` values.
+
+``` javascript
+var data = [
+	{'x':4},
+	{'x':3},
+	{'x':5},
+	{'x':1},
+	{'x':2},
+];
+
+function getValue( d, i ) {
+	return d.x;
+}
+
+var q = quantile( data, 0.25, {
+	'accessor': getValue
+});
+// returns 2
+```
+
+Notes:
+The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the _k_ th quantile.
+
+If the input `array` is not sorted in __ascending__ order, the function is `O( N log(N) )`, where `N` is the input `array` length. If the `array` is sorted, the function is `O(1)`.
+
+If provided a [`matrix`](https://github.com/dstructs/matrix), the function accepts the following `options`:
+
+*	__dim__: dimension along which to compute the [quantile](http://en.wikipedia.org/wiki/Quantile). Default: `2` (along the columns).
+*	__dtype__: output [`matrix`](https://github.com/dstructs/matrix) data type. Default: `float64`.
+
+By default, the function computes the [quantile](http://en.wikipedia.org/wiki/Quantile) along the columns (`dim=2`).
+
+``` javascript
+var matrix = require( 'dstructs-matrix' ),
+	data,
+	mat,
+	median,
+	i;
+
+data = new Int8Array( 25 );
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = i;
+}
+mat = matrix( data, [5,5], 'int8' );
+/*
+	[  0  1  2  3  4
+	   5  6  7  8  9
+	  10 11 12 13 14
+	  15 16 17 18 19
+	  20 21 22 23 24 ]
+*/
+
+median = quantile( mat, 0.5 );
+/*
+	[  2
+	   7
+	  12
+	  17
+	  22 ]
+*/
+```
+
+To compute a [quantile](http://en.wikipedia.org/wiki/Quantile) along the rows, set the `dim` option to `1`.
+
+``` javascript
+mu = mean( mat, {
+	'dim': 1
+});
+/*
+	[ 10, 11, 12, 13, 14 ]
+*/
+```
+
+By default, the output [`matrix`](https://github.com/dstructs/matrix) data type is `float64`. To specify a different output data type, set the `dtype` option.
+
+``` javascript
+mu = mean( mat, {
+	'dim': 1,
+	'dtype': 'uint8'
+});
+/*
+	[ 10, 11, 12, 13, 14 ]
+*/
+
+var dtype = mu.dtype;
+// returns 'uint8'
+```
+
+If provided a [`matrix`](https://github.com/dstructs/matrix) having either dimension equal to `1`, the function treats the [`matrix`](https://github.com/dstructs/matrix) as a [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) and returns a `numeric` value.
+
+``` javascript
+data = [ 2, 4, 5, 3, 8, 2 ];
+
+// Row vector:
+mat = matrix( new Int8Array( data ), [1,6], 'int8' );
+mu = mean( mat );
+// returns 4
+
+// Column vector:
+mat = matrix( new Int8Array( data ), [6,1], 'int8' );
+mu = mean( mat );
+// returns 4
+```
+
+If provided an empty [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array), [`typed array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays), or [`matrix`](https://github.com/dstructs/matrix), the function returns `null`.
+
+``` javascript
+median = quantile( [], 0.5 );
+// returns null
+
+median = quantile( new Int8Array( [] ), 0.5 );
+// returns null
+
+median = quantile( matrix( [0,0] ), 0.5 );
+// returns null
+
+median = quantile( matrix( [0,10] ), 0.5 );
+// returns null
+
+median = quantile( matrix( [10,0] ), 0.5 );
+// returns null
+```
 
 ## Examples
 
 ``` javascript
-var quantile = require( 'compute-quantile' );
+var matrix = require( 'dstructs-matrix' ),
+	quantile = require( 'compute-quantile' );
 
-// Simulate some data...
-var data = new Array( 1000 );
+var data,
+	mat,
+	median,
+	i;
 
-for ( var i = 0, len = data.length; i < len; i++ ) {
-	data[ i ] = Math.round( Math.random()*1000 );
+// ----
+// Plain arrays...
+data = new Array( 1000 );
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = Math.random() * 100;
 }
-
 // Compute the p-quantile for p = 0.5 (median):
-console.log( quantile( data, 0.5 ) );
+median = quantile( data, 0.5 );
+
+// ----
+// non-default method
+median = quantile( data, 0.5, {
+	'method': 4
+});
+
+// ----
+// Object arrays (accessors)...
+function getValue( d ) {
+	return d.x;
+}
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = {
+		'x': data[ i ]
+	};
+}
+median = quantile( data, 0.5, {
+	'accessor': getValue
+});
+
+// ----
+// Typed arrays...
+data = new Int32Array( 1000 );
+for ( i = 0; i < data.length; i++ ) {
+	data[ i ] = Math.random() * 100;
+}
+median = quantile( data, 0.5 );
+
+// ----
+// Matrices (along rows)...
+mat = matrix( data, [100,10], 'int32' );
+median = quantile( mat, 0.5, {
+	'dim': 1
+});
+
+// ----
+// Matrices (along columns)...
+median = quantile( mat, 0.5, {
+	'dim': 2
+});
+
+// ----
+// Matrices (custom output data type)...
+median = quantile( mat, 0.5, {
+	'dtype': 'uint8'
+});
 ```
 
 To run the example code from the top-level application directory,
@@ -69,19 +244,11 @@ To run the example code from the top-level application directory,
 $ node ./examples/index.js
 ```
 
-
-## Notes
-
-The probability `p` is equal to `k / q`, where `q` is the total number of quantiles and `k` is the _k_ th quantile.
-
-If the input `array` is not sorted in __ascending__ order, the function is `O( N log(N) )`, where `N` is the input `array` length. If the `array` is sorted, the function is `O(1)`.
-
-
 ## Tests
 
 ### Unit
 
-Unit tests use the [Mocha](http://visionmedia.github.io/mocha) test framework with [Chai](http://chaijs.com) assertions. To run the tests, execute the following command in the top-level application directory:
+Unit tests use the [Mocha](http://mochajs.org) test framework with [Chai](http://chaijs.com) assertions. To run the tests, execute the following command in the top-level application directory:
 
 ``` bash
 $ make test
@@ -105,15 +272,15 @@ $ make view-cov
 ```
 
 
+---
 ## License
 
-[MIT license](http://opensource.org/licenses/MIT). 
+[MIT license](http://opensource.org/licenses/MIT).
 
 
----
 ## Copyright
 
-Copyright &copy; 2014. Athan Reines.
+Copyright &copy; 2014-2015. The [Compute.io](https://github.com/compute-io) Authors.
 
 
 [npm-image]: http://img.shields.io/npm/v/compute-quantile.svg
