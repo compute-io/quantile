@@ -53,6 +53,21 @@ The `quantile` function supports nine methods to calculate the sample quantiles:
 
 The default method is type `7`. To specify a different method, you can set the `method` option to the respective number.
 
+``` javascript
+var unsorted, q;
+
+unsorted = [ 4, 3, 5, 1, 2 ];
+q = quantile( unsorted, 0.25, {
+	'method': 4
+});
+// returns 1.25
+
+q = quantile( unsorted, 0.25, {
+	'method': 7
+});
+// returns 2
+```
+
 If the input `array` is already sorted in __ascending__ order, you can set the `sorted` option to `true`.
 
 ``` javascript
