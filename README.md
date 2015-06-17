@@ -40,7 +40,7 @@ q = quantile( unsorted, 0.25 );
 The `quantile` function supports nine methods to calculate the sample quantiles:
 
 | Method        |   Description |
-| ------------- |:-------------:|
+| ------------- |:-------------|
 | 1      | Inverse of empirical distribution function. |
 | 2      | Inverse of empirical distribution function. |
 | 3      | The observation numbered closest to `N * p`.|
